@@ -1,7 +1,11 @@
 #include "Facility.h"
 
-Facility::Facility(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
-                   const Borrower& borrower, double amount, const Currency& currency,
+Facility::Facility(const std::string& contractNumber,
+                    const Lender& agent,
+                    const std::vector<Lender>& pool,
+                   const Borrower& borrower,
+                   double amount,
+                    const Currency& currency,
                    const std::chrono::system_clock::time_point& start,
                    const std::chrono::system_clock::time_point& ending,
                    double interestRate,
