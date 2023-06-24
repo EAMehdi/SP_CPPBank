@@ -9,7 +9,7 @@
 #include "Currency.h"
 
 class Deal {
-private:
+protected:
     std::string contractNumber;
     Lender agent;
     std::vector<Lender> pool;

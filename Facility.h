@@ -1,6 +1,6 @@
-#include <string>
-#include <vector>
-#include <chrono>
+#ifndef SP_CPPBANK_FACILITY_H
+#define SP_CPPBANK_FACILITY_H
+
 #include "Deal.h"
 
 class Facility : public Deal {
@@ -27,5 +27,7 @@ public:
     double getEarlyRepaymentPenalty() const { return earlyRepaymentPenalty; }
     void setEarlyRepaymentPenalty(double earlyRepaymentPenalty) { this->earlyRepaymentPenalty = earlyRepaymentPenalty; }
 
+    double calculateInterest() const;
 };
 
+#endif // SP_CPPBANK_FACILITY_H
