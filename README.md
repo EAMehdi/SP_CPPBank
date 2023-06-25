@@ -1,4 +1,8 @@
-# Documentation de Projet: Système de Gestion de Prêts
+# Documentation de Projet C++ : Système de Gestion de Prêts
+
+Juin 2023
+
+Romain DIOP & Mehdi EL AYADI
 
 ## Introduction
 
@@ -13,6 +17,41 @@ La classe `Deal` est la classe principale et elle est héritée par la classe `F
 
 ![mermaid-diagram-2023-06-25-211214](https://github.com/EAMehdi/SP_CPPBank/assets/45198822/f52d03c7-8894-4eb2-92a8-7c116e83c398)
 
+```console
+C:\Users\AM\Documents\GitHub\SP_CPPBank\cmake-build-debug\SP_CPPBank.exe
+Loan Details
+Contract Number: D1234
+Borrower: Air France
+Amount: 1e+06 EUR
+Starting Date: 25/06/2023
+Ending Date: 24/06/2024
+-----------------------------
+Facility Details
+Amount: 500000 USD
+Repayment Schedule: 25/07/2023
+Early Repayment Penalty: 0.2
+Total Interest in the Portfolio: 3626.11
+Making Repayment...
+-----------------------------
+Repayment Amount: 403626 USD
+Paying back lenders:
+- Agent: JP Morgan Chase
+- Pool Lenders: Bank of America, Wells Fargo,
+New Part Added for Repayment Cycle:
+Part Repayment Date: 24/08/2023
+Total Interest in the Portfolio: 7252.22
+Making Repayment...
+-----------------------------
+Repayment Amount: 307252 USD
+Paying back lenders:
+- Agent: JP Morgan Chase
+- Pool Lenders: Bank of America, Wells Fargo,
+New Part Added for Repayment Cycle:
+Part Repayment Date: 23/09/2023
+Loan has been fully repaid!
+-----------------------------
+
+```
 
 ## Difficultés rencontrées
 
