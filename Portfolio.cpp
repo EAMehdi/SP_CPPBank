@@ -20,12 +20,16 @@ void Portfolio::removeFacility(const std::string& contractNumber) {
 }
 
 double Portfolio::calculateTotalInterest() const {
-    double totalInterest = 0;
-    for (const auto& facility : facilities) {
-        totalInterest += facility.calculateInterest();
+    double totalInterest = 0.0;
+
+    for (const Facility& facility : facilities) {
+        double interest = facility.calculateInterest();
+        double conversionRate = facility.getCurrency().getConversionRateToUSD();
+        totalInterest += interest * conversionRate;
     }
     return totalInterest;
 }
+
 
 bool Portfolio::isLoanPaidInFull() const {
     for (const auto& facility : facilities) {

@@ -25,7 +25,7 @@ int main() {
     // Create a deal
     std::string contractNumber = "D1234";
     double amount = 1000000.0;
-    Currency currency("EUR");
+    Currency currency("EUR", 1.2);
     std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     std::chrono::system_clock::time_point ending = start + std::chrono::hours(24 * 365); // 1 year
     Deal deal(contractNumber, lender1, pool, borrower, amount, currency, start, ending);
@@ -34,7 +34,7 @@ int main() {
     std::chrono::system_clock::time_point facilityStart = start;
     std::chrono::system_clock::time_point facilityEnd = start + std::chrono::hours(24 * 90); // 90 days
     double facilityAmount = 500000.0;
-    Currency facilityCurrency("USD");
+    Currency facilityCurrency("USD" , 1.0);
     std::chrono::system_clock::time_point repaymentSchedule = start + std::chrono::hours(24 * 30); // 30 days
     double earlyRepaymentPenalty = 0.2; // Example value
     Facility facility1(contractNumber, lender1, pool, borrower, facilityAmount, facilityCurrency, facilityStart,
