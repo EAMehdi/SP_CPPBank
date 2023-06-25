@@ -1,0 +1,289 @@
+Title: Borrower.cpp
+Content:
+#include "Borrower.h"
+
+Borrower::Borrower(const std::string &name) : name(name) {}
+
+std::string Borrower::getName() const {
+    return name;
+}
+------------------------
+Title: Borrower.h
+Content:
+#ifndef BORROWER_H
+#define BORROWER_H
+
+#include <string>
+
+class Borrower {
+private:
+    std::string name;
+
+public:
+    Borrower(const std::string &name);
+    std::string getName() const;
+};
+
+#endif //BORROWER_H
+------------------------
+Title: Currency.cpp
+Content:
+#include "Currency.h"
+
+Currency::Currency(const std::string &code) : code(code) {}
+
+std::string Currency::getCode() const {
+    return code;
+}
+
+------------------------
+Title: Currency.h
+Content:
+#ifndef CURRENCY_H
+#define CURRENCY_H
+
+#include <string>
+
+class Currency {
+private:
+    std::string code;
+
+public:
+    Currency(const std::string &code);
+    std::string getCode() const;
+};
+
+#endif //CURRENCY_H
+
+------------------------
+Title: Deal.cpp
+Content:
+#include "Deal.h"
+
+
+Deal::Deal(const std::string &contractNumber,
+           const Lender &agent,
+           const std::vector<Lender> &pool,
+           const Borrower &borrower,
+           double amount,
+           const Currency &currency,
+           const std::chrono::system_clock::time_point &start,
+           const std::chrono::system_clock::time_point &ending)
+    : contractNumber(contractNumber), agent(agent), pool(pool), borrower(borrower), amount(amount), currency(currency), start(start), ending(ending) {
+    status = "Initiated";
+}
+
+void Deal::setStatus(const std::string& status) {
+    this->status = status;
+}
+------------------------
+Title: Deal.h
+Content:
+#ifndef DEAL_H
+#define DEAL_H
+
+#include <string>
+#include <vector>
+#include <chrono>
+#include "Lender.h"
+#include "Borrower.h"
+#include "Currency.h"
+
+class Deal {
+private:
+    std::string contractNumber;
+    Lender agent;
+    std::vector<Lender> pool;
+    Borrower borrower;
+    double amount;
+    Currency currency;
+    std::chrono::system_clock::time_point start;
+    std::chrono::system_clock::time_point ending;
+    std::string status;
+
+public:
+    // constructors, setters, etc...
+
+    Deal(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
+    const Borrower& borrower, double amount, const Currency& currency,
+    const std::chrono::system_clock::time_point& start, const std::chrono::system_clock::time_point& ending);
+
+    std::string getContractNumber() const { return contractNumber; }
+    Lender getAgent() const { return agent; }
+    std::vector<Lender> getPool() const { return pool; }
+    Borrower getBorrower() const { return borrower; }
+    double getAmount() const { return amount; }
+    Currency getCurrency() const { return currency; }
+    std::chrono::system_clock::time_point getStart() const { return start; }
+    std::chrono::system_clock::time_point getEnd() const { return ending; }
+    std::string getStatus() const { return status; }
+    void setStatus(const std::string& status);
+};
+#endif
+------------------------
+Title: Facility.cpp
+Content:
+#include "Facility.h"
+
+Facility::Facility(const std::string& contractNumber,
+                    const Lender& agent,
+                    const std::vector<Lender>& pool,
+                   const Borrower& borrower,
+                   double amount,
+                    const Currency& currency,
+                   const std::chrono::system_clock::time_point& start,
+                   const std::chrono::system_clock::time_point& ending,
+                   double interestRate,
+                   const std::chrono::system_clock::time_point& repaymentSchedule,
+                   double earlyRepaymentPenalty)
+    : Deal(contractNumber, agent, pool, borrower, amount, currency, start, ending),
+      interestRate(interestRate),
+      repaymentSchedule(repaymentSchedule),
+      earlyRepaymentPenalty(earlyRepaymentPenalty) {}
+
+------------------------
+Title: Facility.h
+Content:
+#include <string>
+#include <vector>
+#include <chrono>
+#include "Deal.h"
+
+class Facility : public Deal {
+private:
+    double interestRate;
+    std::chrono::system_clock::time_point repaymentSchedule;
+    double earlyRepaymentPenalty;
+
+public:
+    Facility(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
+             const Borrower& borrower, double amount, const Currency& currency,
+             const std::chrono::system_clock::time_point& start,
+             const std::chrono::system_clock::time_point& ending,
+             double interestRate,
+             const std::chrono::system_clock::time_point& repaymentSchedule,
+             double earlyRepaymentPenalty);
+
+    double getInterestRate() const { return interestRate; }
+    void setInterestRate(double interestRate) { this->interestRate = interestRate; }
+
+    std::chrono::system_clock::time_point getRepaymentSchedule() const { return repaymentSchedule; }
+    void setRepaymentSchedule(const std::chrono::system_clock::time_point& repaymentSchedule) { this->repaymentSchedule = repaymentSchedule; }
+
+    double getEarlyRepaymentPenalty() const { return earlyRepaymentPenalty; }
+    void setEarlyRepaymentPenalty(double earlyRepaymentPenalty) { this->earlyRepaymentPenalty = earlyRepaymentPenalty; }
+
+};
+
+------------------------
+Title: Lender.cpp
+Content:
+#include "Lender.h"
+
+Lender::Lender(const std::string &name) : name(name) {}
+
+std::string Lender::getName() const {
+    return name;
+}
+
+------------------------
+Title: Lender.h
+Content:
+#ifndef LENDER_H
+#define LENDER_H
+
+#include <string>
+
+class Lender {
+private:
+    std::string name;
+
+public:
+    Lender(const std::string &name);
+    std::string getName() const;
+};
+
+#endif //LENDER_H
+
+------------------------
+Title: README.md
+Content:
+# SP_CPPBank------------------------
+Title: main.cpp
+Content:
+#include <iostream>
+#include <vector>
+#include "Lender.h"
+#include "Borrower.h"
+#include "Currency.h"
+#include "Deal.h"
+#include "Facility.h"
+
+int main() {
+    // Create Lenders
+    Lender lender1("Bank A");
+    Lender lender2("Bank B");
+    Lender lender3("Bank C");
+
+    // Create a pool of lenders
+    std::vector<Lender> pool = {lender1, lender2, lender3};
+
+    // Create a Borrower
+    Borrower borrower("Air France");
+
+    // Create a Currency
+
+    Currency currency("USD");
+
+    auto now = std::chrono::system_clock::now();
+
+    // Deal start and end dates
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point ending = start + std::chrono::hours(24*365);  // One year later
+
+    // Create a Deal
+    Deal deal("S1234", lender1, pool, borrower, 10000000, currency, start, ending);
+
+
+    // Print some info about the deal
+    std::cout << "Deal Contract Number: " << deal.getContractNumber() << std::endl;
+    std::cout << "Deal Agent: " << deal.getAgent().getName() << std::endl;
+    std::cout << "Deal Borrower: " << deal.getBorrower().getName() << std::endl;
+    std::cout << "Deal Amount: " << deal.getAmount() << std::endl;
+    std::cout << "Deal Currency: " << deal.getCurrency().getCode() << std::endl;
+    std::cout << "Deal Status: " << deal.getStatus() << std::endl;
+
+
+//    Facility facility("FAC1", deal, lender1, 5000000.0, now, now);
+    Facility facility("FAC1", lender1, pool, borrower, 5000000.0, currency, start, ending, 0.5, now, 0.2);
+
+    std::cout << "Facility ----------------" << std::endl;
+    // Print out details of the facility
+    std::cout << "Facility Contract Number: " << facility.getContractNumber() << std::endl;
+    std::cout << "Facility Agent: " << facility.getAgent().getName() << std::endl;
+    std::cout << "Facility Borrower: " << facility.getBorrower().getName() << std::endl;
+    std::cout << "Facility Amount: " << facility.getAmount() << std::endl;
+    std::cout << "Facility Currency: " << facility.getCurrency().getCode() << std::endl;
+    std::cout << "Facility Status: " << facility.getStatus() << std::endl;
+
+
+    return 0;
+}
+------------------------
+Title: output.txt
+Content:
+------------------------
+Title: script.sh
+Content:
+#!/bin/bash
+
+for file in *; do
+	if [[ -f $file ]]; then
+		echo "Title: $file"
+		echo "Content:"
+		cat "$file"
+		echo "------------------------"
+	fi
+done
+
+------------------------
