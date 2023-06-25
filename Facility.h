@@ -1,22 +1,30 @@
 #ifndef SP_CPPBANK_FACILITY_H
 #define SP_CPPBANK_FACILITY_H
-
+#pragma once
+#include <vector>
 #include "Deal.h"
-#include "Part.h"
 
+class Part;  // forward declaration
+// Forward declaration of Deal
+class Deal;
 class Facility : public Deal {
 private:
     double interestRate;
     std::chrono::system_clock::time_point repaymentSchedule;
     double earlyRepaymentPenalty;
-    std::vector<Part> parts; // Store parts in a vector
-
+    std::vector<Part*> parts;
+    double calculateInterestRate() const;
+    double totalPrincipalRepaid; // Add this line
+    double getRemainingPrincipal() const;
 public:
-    Facility(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
-             const Borrower& borrower, double amount, const Currency& currency,
+    Facility(const std::string& contractNumber,
+             const Lender& agent,
+             const std::vector<Lender>& pool,
+             const Borrower& borrower,
+             double amount,
+             const Currency& currency,
              const std::chrono::system_clock::time_point& start,
              const std::chrono::system_clock::time_point& ending,
-             double interestRate,
              const std::chrono::system_clock::time_point& repaymentSchedule,
              double earlyRepaymentPenalty);
 
@@ -30,15 +38,13 @@ public:
     void setEarlyRepaymentPenalty(double earlyRepaymentPenalty) { this->earlyRepaymentPenalty = earlyRepaymentPenalty; }
 
     double calculateInterest() const;
-    // Method to add a part
-    void addPart(const Part& part) {
-        parts.push_back(part);
-    }
+    void addPart(const Part& part);
+    std::vector<Part> getParts() const;
+    void makeRepayment(double amount);
+    bool isPaidInFull() const;
 
-    // Method to get all parts
-    std::vector<Part> getParts() const {
-        return parts;
-    }
+    double getRemainingPrincipal();
+
 };
 
 #endif // SP_CPPBANK_FACILITY_H

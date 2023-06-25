@@ -1,6 +1,9 @@
 #include <algorithm>
 #include "Portfolio.h"
 
+Portfolio::Portfolio() {
+    // Add any necessary initialization code here
+}
 Portfolio::Portfolio(const std::vector<Facility>& facilities)
         : facilities(facilities) {}
 
@@ -22,4 +25,22 @@ double Portfolio::calculateTotalInterest() const {
         totalInterest += facility.calculateInterest();
     }
     return totalInterest;
+}
+
+bool Portfolio::isLoanPaidInFull() const {
+    for (const auto& facility : facilities) {
+        if (!facility.isPaidInFull()) {
+            return false;
+        }
+    }
+    return true;
+}
+
+void Portfolio::makeRepayment(const std::string& contractNumber, double amount) {
+    for (auto& facility : facilities) {
+        if (facility.getContractNumber() == contractNumber) {
+            facility.makeRepayment(amount);
+            break;
+        }
+    }
 }

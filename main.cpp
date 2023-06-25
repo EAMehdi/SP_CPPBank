@@ -1,72 +1,114 @@
 #include <iostream>
 #include <vector>
-#include "Lender.h"
-#include "Borrower.h"
-#include "Currency.h"
+#include <chrono>
 #include "Deal.h"
 #include "Facility.h"
-#include "Portfolio.h"
 #include "Part.h"
+#include "Portfolio.h"
+#include "Lender.h"
+#include "Borrower.h"
+
+// ...
 
 int main() {
-    // Create Lenders
-    Lender lender1("Bank A");
-    Lender lender2("Bank B");
-    Lender lender3("Bank C");
+    // Create lenders
+    Lender lender1("JP Morgan Chase");
+    Lender lender2("Bank of America");
+    Lender lender3("Wells Fargo");
 
-    // Create a pool of lenders
-    std::vector<Lender> pool = {lender1, lender2, lender3};
+    // Add lenders to the pool
+    std::vector<Lender> pool = {lender2, lender3};
 
-    // Create a Borrower
+    // Create borrower
     Borrower borrower("Air France");
 
-    // Create a Currency
-    Currency currency("USD");
+    // Create a deal
+    std::string contractNumber = "D1234";
+    double amount = 1000000.0;
+    Currency currency("EUR");
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point ending = start + std::chrono::hours(24 * 365); // 1 year
+    Deal deal(contractNumber, lender1, pool, borrower, amount, currency, start, ending);
 
-    auto now = std::chrono::system_clock::now();
+    // Create facilities
+    std::chrono::system_clock::time_point facilityStart = start;
+    std::chrono::system_clock::time_point facilityEnd = start + std::chrono::hours(24 * 90); // 90 days
+    double facilityAmount = 500000.0;
+    Currency facilityCurrency("USD");
+    std::chrono::system_clock::time_point repaymentSchedule = start + std::chrono::hours(24 * 30); // 30 days
+    double earlyRepaymentPenalty = 0.2; // Example value
+    Facility facility1(contractNumber, lender1, pool, borrower, facilityAmount, facilityCurrency, facilityStart,
+                       facilityEnd, repaymentSchedule, earlyRepaymentPenalty);
 
-    // Deal start and end dates
-    std::chrono::system_clock::time_point start = now;
-    std::chrono::system_clock::time_point ending = start + std::chrono::hours(24*365);  // One year later
+    // Add facility to the deal
+    deal.addFacility(facility1);
 
-    // Create a Deal
-    Deal deal("S1234", lender1, pool, borrower, 10000000, currency, start, ending);
+    // Create parts
+    double partAmount = 100000.0;
+    std::chrono::system_clock::time_point partRepaymentDate = facilityStart + std::chrono::hours(24 * 30); // 30 days
+    Part part1(facility1, partAmount, partRepaymentDate);
 
-    // Create a Facility with an interest rate of 0.05 (5%) and an early repayment penalty of 0.2 (20%)
-    Facility facility("FAC1", lender1, pool, borrower, 5000000.0, currency, start, ending, 0.05, now, 0.2);
+    // Add part to the facility
+    facility1.addPart(part1);
 
-    // Create a Part with a repayment of 1 million and a repayment date a year later
-    auto one_year_from_now = std::chrono::system_clock::now() + std::chrono::hours(24*365);
-    Part part(facility, 1000000.0, one_year_from_now);
-    // Create a Portfolio
+    // Create portfolio
     Portfolio portfolio;
 
-    // Add the facility to the portfolio
-    portfolio.addFacility(facility);
+    // Add facility to the portfolio
+    portfolio.addFacility(facility1);
 
-    // Print some info about the deal
-    std::cout << "Deal Contract Number: " << deal.getContractNumber() << std::endl;
-    std::cout << "Deal Agent: " << deal.getAgent().getName() << std::endl;
-    std::cout << "Deal Borrower: " << deal.getBorrower().getName() << std::endl;
-    std::cout << "Deal Amount: " << deal.getAmount() << std::endl;
-    std::cout << "Deal Currency: " << deal.getCurrency().getCode() << std::endl;
-    std::cout << "Deal Status: " << deal.getStatus() << std::endl;
+    std::cout << "Loan Details" << std::endl;
+    std::cout << "Contract Number: " << contractNumber << std::endl;
+    std::cout << "Borrower: " << borrower.getName() << std::endl;
+    std::cout << "Amount: " << amount << " " << currency.getCode() << std::endl;
+    std::cout << "Starting Date: " << start.time_since_epoch().count() << std::endl;
+    std::cout << "Ending Date: " << ending.time_since_epoch().count() << std::endl;
 
-    // Print out details of the facility
-    std::cout << "Facility Contract Number: " << facility.getContractNumber() << std::endl;
-    std::cout << "Facility Agent: " << facility.getAgent().getName() << std::endl;
-    std::cout << "Facility Borrower: " << facility.getBorrower().getName() << std::endl;
-    std::cout << "Facility Amount: " << facility.getAmount() << std::endl;
-    std::cout << "Facility Currency: " << facility.getCurrency().getCode() << std::endl;
-    std::cout << "Facility Interest: " << facility.calculateInterest() << std::endl;  // Print calculated interest
+    std::cout << "Facility Details" << std::endl;
+    std::cout << "Amount: " << facilityAmount << " " << facilityCurrency.getCode() << std::endl;
+    std::cout << "Repayment Schedule: " << repaymentSchedule.time_since_epoch().count() << std::endl;
+    std::cout << "Early Repayment Penalty: " << earlyRepaymentPenalty << std::endl;
 
-    // Print out details of the Part
-    std::cout << "Part Facility Contract Number: " << part.getFacility().getContractNumber() << std::endl;
-    std::cout << "Part Repayment Amount: " << part.getRepaymentAmount() << std::endl;
-    std::cout << "Part Remaining to Pay: " << part.getRemainingToPay() << std::endl;
+    // Perform repayment cycles until the loan is paid in full
+    while (!facility1.isPaidInFull()) {
+        // Calculate and display the total interest in the portfolio
+        double totalInterest = portfolio.calculateTotalInterest();
+        std::cout << "Total Interest in the Portfolio: " << totalInterest << std::endl;
 
-    // Print out details of the portfolio
-    std::cout << "Portfolio Total Interest: " << portfolio.calculateTotalInterest() << std::endl;
+        // Make a repayment
+        double remainingPrincipal = facility1.getRemainingPrincipal(); // Get the remaining principal amount
+        double repaymentAmount = remainingPrincipal + totalInterest; // Repayment amount includes remaining principal and interest
+
+        std::cout << "Making Repayment..." << std::endl;
+        std::cout << "Repayment Amount: " << repaymentAmount << " " << facilityCurrency.getCode() << std::endl;
+        std::cout << "Paying back lenders:" << std::endl;
+        std::cout << "- Agent: " << facility1.getAgent().getName() << std::endl;
+        std::cout << "- Pool Lenders: ";
+        for (const Lender& lender : facility1.getPool()) {
+            std::cout << lender.getName() << ", ";
+        }
+        std::cout << std::endl;
+
+        facility1.makeRepayment(repaymentAmount);
+
+        // Update the total interest after the repayment
+        totalInterest = portfolio.calculateTotalInterest();
+
+        // Create a new part for the next repayment cycle
+        partRepaymentDate += std::chrono::hours(24 * 30); // 30 days
+        Part newPart(facility1, partAmount, partRepaymentDate);
+
+        // Add the new part to the facility and portfolio
+        facility1.addPart(newPart);
+        portfolio.addFacility(facility1);
+
+        std::cout << "New Part Added for Repayment Cycle:" << std::endl;
+        std::cout << "Part Repayment Date: " << partRepaymentDate.time_since_epoch().count() << std::endl;
+    }
+
+    std::cout << "Loan has been fully repaid!" << std::endl;
 
     return 0;
 }
+
+// ...

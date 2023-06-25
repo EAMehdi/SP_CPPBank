@@ -7,7 +7,8 @@
 #include "Lender.h"
 #include "Borrower.h"
 #include "Currency.h"
-
+// Forward declaration of Facility
+class Facility;
 class Deal {
 protected:
     std::string contractNumber;
@@ -19,6 +20,8 @@ protected:
     std::chrono::system_clock::time_point start;
     std::chrono::system_clock::time_point ending;
     std::string status;
+    std::vector<Facility> facilities; // Store facilities in a vector
+
 
 public:
     // constructors, setters, etc...
@@ -37,5 +40,7 @@ public:
     std::chrono::system_clock::time_point getEnd() const { return ending; }
     std::string getStatus() const { return status; }
     void setStatus(const std::string& status);
+
+    void addFacility(const Facility& facility);
 };
 #endif

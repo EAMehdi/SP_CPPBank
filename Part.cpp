@@ -1,7 +1,7 @@
 // Created by diop on 24/06/2023.
 
 #include "Part.h"
-
+#include "Facility.h"  // include Facility header here
 Part::Part(Facility& facility, double repaymentAmount, std::chrono::system_clock::time_point repaymentDate)
         : facility(facility), repaymentAmount(repaymentAmount), repaymentDate(repaymentDate) {
     // Initialize remainingToPay with the repaymentAmount

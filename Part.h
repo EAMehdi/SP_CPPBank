@@ -3,7 +3,7 @@
 
 #include <chrono>
 #include <string>  // Include for std::string
-#include "Facility.h"  // Include for Facility
+class Facility;  // forward declaration
 
 class Part {  // Define class Part
 public:
