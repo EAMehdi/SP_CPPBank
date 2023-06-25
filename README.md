@@ -1,8 +1,8 @@
 # Documentation de Projet C++ : Système de Gestion de Prêts
 
-Juin 2023
+Date : Juin 2023
 
-Romain DIOP & Mehdi EL AYADI
+Réalisé par : Romain DIOP & Mehdi EL AYADI
 
 ## Introduction
 
