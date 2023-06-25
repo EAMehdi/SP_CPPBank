@@ -2,12 +2,14 @@
 #define SP_CPPBANK_FACILITY_H
 
 #include "Deal.h"
+#include "Part.h"
 
 class Facility : public Deal {
 private:
     double interestRate;
     std::chrono::system_clock::time_point repaymentSchedule;
     double earlyRepaymentPenalty;
+    std::vector<Part> parts; // Store parts in a vector
 
 public:
     Facility(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
@@ -28,6 +30,15 @@ public:
     void setEarlyRepaymentPenalty(double earlyRepaymentPenalty) { this->earlyRepaymentPenalty = earlyRepaymentPenalty; }
 
     double calculateInterest() const;
+    // Method to add a part
+    void addPart(const Part& part) {
+        parts.push_back(part);
+    }
+
+    // Method to get all parts
+    std::vector<Part> getParts() const {
+        return parts;
+    }
 };
 
 #endif // SP_CPPBANK_FACILITY_H

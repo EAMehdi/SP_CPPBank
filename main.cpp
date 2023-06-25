@@ -35,9 +35,9 @@ int main() {
     // Create a Facility with an interest rate of 0.05 (5%) and an early repayment penalty of 0.2 (20%)
     Facility facility("FAC1", lender1, pool, borrower, 5000000.0, currency, start, ending, 0.05, now, 0.2);
 
-    // Create a Part with a repayment of 1 million
-    Part part(facility, 1000000.0);
-
+    // Create a Part with a repayment of 1 million and a repayment date a year later
+    auto one_year_from_now = std::chrono::system_clock::now() + std::chrono::hours(24*365);
+    Part part(facility, 1000000.0, one_year_from_now);
     // Create a Portfolio
     Portfolio portfolio;
 
@@ -61,7 +61,9 @@ int main() {
     std::cout << "Facility Interest: " << facility.calculateInterest() << std::endl;  // Print calculated interest
 
     // Print out details of the Part
+    std::cout << "Part Facility Contract Number: " << part.getFacility().getContractNumber() << std::endl;
     std::cout << "Part Repayment Amount: " << part.getRepaymentAmount() << std::endl;
+    std::cout << "Part Remaining to Pay: " << part.getRemainingToPay() << std::endl;
 
     // Print out details of the portfolio
     std::cout << "Portfolio Total Interest: " << portfolio.calculateTotalInterest() << std::endl;
