@@ -41,7 +41,6 @@ Par ailleurs, certains points pourraient être améliorés dans notre code. Voic
 3. **Style de code cohérent**: Il est important de maintenir un style de code cohérent. Par exemple, certaines fonctions utilisent une définition inline à l'intérieur de la déclaration de classe, tandis que d'autres sont seulement déclarées dans la classe et définies séparément.
 
 4. **Mélange de la logique dans `main.cpp`**: Il est généralement préférable de séparer la logique et la fonctionnalité de `main.cpp`. Nous pourrions déplacer la majorité de la logique dans des méthodes à l'intérieur de nos classes.
-5. 
 
 ## Conclusion
 
