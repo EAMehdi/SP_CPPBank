@@ -67,15 +67,15 @@ Le travail a été équitablement réparti entre les membres de l'équipe. Chaqu
 
 Notre système de gestion de prêts est capable de gérer plusieurs emprunteurs, prêteurs, deals, parties et installations. Cependant, il reste des améliorations à apporter.
 
-Nous avons noté l'absence d'une véritable **base de données** pour stocker et gérer les données de manière plus efficace. Actuellement, toutes les données sont stockées en mémoire, ce qui n'est pas idéal pour un système de production réel.
+Nous avons noté **l'absence d'une véritable base de données** pour stocker et gérer les données de manière plus efficace. Actuellement, toutes les données sont stockées en mémoire, ce qui n'est **pas idéal** pour un système de production réel.
 
 De plus, notre système ne prend pas en charge les taux d'intérêt variables, ce qui pourrait être une amélioration intéressante à envisager à l'avenir.
 
 Par ailleurs, certains points pourraient être améliorés dans notre code. Voici quelques remarques qui pourraient être prises en compte :
 
-1. **Synchronisation entre les fichiers d'en-tête et les fichiers d'implémentation**: Les méthodes et attributs déclarés dans les fichiers d'en-tête devraient correspondre exactement avec les fichiers d'implémentation.
+1. **Synchronisation entre les fichiers d'en-tête (.h) et les fichiers d'implémentation (.cpp)**: Les méthodes et attributs déclarés dans les fichiers d'en-tête devraient correspondre exactement avec les fichiers d'implémentation.
 
-2. **Gestion de la mémoire**: Nous utilisons des pointeurs bruts dans certaines parties du code. En C++, il faut gérer manuellement l'allocation et la libération de la mémoire pour éviter les fuites de mémoire. Nous pourrions envisager d'utiliser des pointeurs intelligents, comme `std::unique_ptr` ou `std::shared_ptr`, qui fournissent une gestion de la mémoire automatique et déterministe.
+2. **Gestion de la mémoire**: Nous utilisons des pointeurs bruts dans certaines parties du code. En C++, il faut gérer manuellement l'allocation et la libération de la mémoire pour éviter les fuites de mémoire. Nous pourrions envisager d'utiliser des pointeurs plus intelligemment avec des shared et unique_ptr. 
 
 3. **Style de code cohérent**: Il est important de maintenir un style de code cohérent. Par exemple, certaines fonctions utilisent une définition inline à l'intérieur de la déclaration de classe, tandis que d'autres sont seulement déclarées dans la classe et définies séparément.
 
