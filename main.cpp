@@ -7,6 +7,15 @@
 #include "Portfolio.h"
 #include "Lender.h"
 #include "Borrower.h"
+#include <iomanip>
+
+std::string formatTime(const std::chrono::system_clock::time_point& tp) {
+    auto t = std::chrono::system_clock::to_time_t(tp);
+    auto* locTime = std::localtime(&t);
+    std::ostringstream ss;
+    ss << std::put_time(locTime, "%d/%m/%Y");
+    return ss.str();
+}
 
 // ...
 
@@ -61,12 +70,12 @@ int main() {
     std::cout << "Contract Number: " << contractNumber << std::endl;
     std::cout << "Borrower: " << borrower.getName() << std::endl;
     std::cout << "Amount: " << amount << " " << currency.getCode() << std::endl;
-    std::cout << "Starting Date: " << start.time_since_epoch().count() << std::endl;
-    std::cout << "Ending Date: " << ending.time_since_epoch().count() << std::endl;
+    std::cout << "Starting Date: " << formatTime(start) << std::endl;
+    std::cout << "Ending Date: " << formatTime(ending) << std::endl;
 
     std::cout << "Facility Details" << std::endl;
     std::cout << "Amount: " << facilityAmount << " " << facilityCurrency.getCode() << std::endl;
-    std::cout << "Repayment Schedule: " << repaymentSchedule.time_since_epoch().count() << std::endl;
+    std::cout << "Repayment Schedule: " << formatTime(repaymentSchedule) << std::endl;
     std::cout << "Early Repayment Penalty: " << earlyRepaymentPenalty << std::endl;
 
     // Perform repayment cycles until the loan is paid in full
@@ -103,7 +112,7 @@ int main() {
         portfolio.addFacility(facility1);
 
         std::cout << "New Part Added for Repayment Cycle:" << std::endl;
-        std::cout << "Part Repayment Date: " << partRepaymentDate.time_since_epoch().count() << std::endl;
+        std::cout << "Part Repayment Date: " << formatTime(partRepaymentDate) << std::endl;
     }
 
     std::cout << "Loan has been fully repaid!" << std::endl;

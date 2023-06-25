@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
+cmake_minimum_required(VERSION 3.24)
 project(SP_CPPBank)
 
 set(CMAKE_CXX_STANDARD 14)
@@ -16,4 +16,7 @@ add_executable(SP_CPPBank
         Facility.h
         Lender.cpp
         Lender.h
-        main.cpp Portfolio.cpp Portfolio.h Part.cpp Part.h)
+        main.cpp Portfolio.cpp
+        Portfolio.h
+        Part.cpp
+        Part.h)
