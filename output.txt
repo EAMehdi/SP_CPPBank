@@ -2,12 +2,11 @@ Title: Borrower.cpp
 Content:
 #include "Borrower.h"
 
-Borrower::Borrower(const std::string &name) : name(name) {}
+Borrower::Borrower(const std::string& name) : name(name) {}
 
 std::string Borrower::getName() const {
     return name;
-}
-------------------------
+}------------------------
 Title: Borrower.h
 Content:
 #ifndef BORROWER_H
@@ -25,6 +24,28 @@ public:
 };
 
 #endif //BORROWER_H
+------------------------
+Title: CMakeLists.txt
+Content:
+cmake_minimum_required(VERSION 3.25)
+project(SP_CPPBank)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(.)
+
+add_executable(SP_CPPBank
+        Borrower.cpp
+        Borrower.h
+        Currency.cpp
+        Currency.h
+        Deal.cpp
+        Deal.h
+        Facility.cpp
+        Facility.h
+        Lender.cpp
+        Lender.h
+        main.cpp Portfolio.cpp Portfolio.h Part.cpp Part.h)
 ------------------------
 Title: Currency.cpp
 Content:
@@ -90,7 +111,7 @@ Content:
 #include "Currency.h"
 
 class Deal {
-private:
+protected:
     std::string contractNumber;
     Lender agent;
     std::vector<Lender> pool;
@@ -124,36 +145,46 @@ public:
 Title: Facility.cpp
 Content:
 #include "Facility.h"
-
+#include "Part.h"
 Facility::Facility(const std::string& contractNumber,
-                    const Lender& agent,
-                    const std::vector<Lender>& pool,
+                   const Lender& agent,
+                   const std::vector<Lender>& pool,
                    const Borrower& borrower,
                    double amount,
-                    const Currency& currency,
+                   const Currency& currency,
                    const std::chrono::system_clock::time_point& start,
                    const std::chrono::system_clock::time_point& ending,
                    double interestRate,
                    const std::chrono::system_clock::time_point& repaymentSchedule,
                    double earlyRepaymentPenalty)
-    : Deal(contractNumber, agent, pool, borrower, amount, currency, start, ending),
-      interestRate(interestRate),
-      repaymentSchedule(repaymentSchedule),
-      earlyRepaymentPenalty(earlyRepaymentPenalty) {}
+        : Deal(contractNumber, agent, pool, borrower, amount, currency, start, ending),
+          interestRate(interestRate),
+          repaymentSchedule(repaymentSchedule),
+          earlyRepaymentPenalty(earlyRepaymentPenalty) {}
 
-------------------------
+double Facility::calculateInterest() const {
+    auto duration = std::chrono::duration_cast<std::chrono::hours>(ending - start).count();
+    double years = duration / (24.0 * 365.0);
+
+    const double inflationRate = 0.02;  // assumed annual inflation rate of 2%
+    double realInterestRate = ((1 + interestRate) / (1 + inflationRate)) - 1;
+
+    return this->amount * realInterestRate * years;
+}------------------------
 Title: Facility.h
 Content:
-#include <string>
-#include <vector>
-#include <chrono>
+#ifndef SP_CPPBANK_FACILITY_H
+#define SP_CPPBANK_FACILITY_H
+
 #include "Deal.h"
+#include "Part.h"
 
 class Facility : public Deal {
 private:
     double interestRate;
     std::chrono::system_clock::time_point repaymentSchedule;
     double earlyRepaymentPenalty;
+    std::vector<Part> parts; // Store parts in a vector
 
 public:
     Facility(const std::string& contractNumber, const Lender& agent, const std::vector<Lender>& pool,
@@ -173,9 +204,19 @@ public:
     double getEarlyRepaymentPenalty() const { return earlyRepaymentPenalty; }
     void setEarlyRepaymentPenalty(double earlyRepaymentPenalty) { this->earlyRepaymentPenalty = earlyRepaymentPenalty; }
 
+    double calculateInterest() const;
+    // Method to add a part
+    void addPart(const Part& part) {
+        parts.push_back(part);
+    }
+
+    // Method to get all parts
+    std::vector<Part> getParts() const {
+        return parts;
+    }
 };
 
-------------------------
+#endif // SP_CPPBANK_FACILITY_H------------------------
 Title: Lender.cpp
 Content:
 #include "Lender.h"
@@ -206,6 +247,107 @@ public:
 #endif //LENDER_H
 
 ------------------------
+Title: Part.cpp
+Content:
+// Created by diop on 24/06/2023.
+
+#include "Part.h"
+
+Part::Part(Facility& facility, double repaymentAmount, std::chrono::system_clock::time_point repaymentDate)
+        : facility(facility), repaymentAmount(repaymentAmount), repaymentDate(repaymentDate) {
+    // Initialize remainingToPay with the repaymentAmount
+    remainingToPay = repaymentAmount;
+}
+// Define the constructor. It initializes the member variables with the provided arguments.
+
+Facility& Part::getFacility() {  // Define method to get the facility
+    return facility;  // Return reference to the facility
+}
+
+double Part::getRepaymentAmount() {  // Define method to get the repayment amount
+    return repaymentAmount;  // Return the repayment amount
+}
+
+std::chrono::system_clock::time_point Part::getRepaymentDate() {
+    return repaymentDate;  // Return the repayment date
+}------------------------
+Title: Part.h
+Content:
+#ifndef SP_CPPBANK_PART_H
+#define SP_CPPBANK_PART_H
+
+#include <chrono>
+#include <string>  // Include for std::string
+#include "Facility.h"  // Include for Facility
+
+class Part {  // Define class Part
+public:
+    Part(Facility& facility, double repaymentAmount, std::chrono::system_clock::time_point repaymentDate);  // Update the constructor
+    Facility& getFacility();  // Method to get the facility
+    double getRepaymentAmount();  // Method to get the repayment amount
+    std::chrono::system_clock::time_point getRepaymentDate();
+    double getRemainingToPay() const { return remainingToPay; }  // Moved to public section
+
+private:
+    Facility& facility;  // Private member variable: reference to Facility
+    double repaymentAmount;  // Private member variable: repayment amount
+    std::chrono::system_clock::time_point repaymentDate;
+    double remainingToPay; // Amount remaining to be paid
+
+    void setRemainingToPay(double amount) { remainingToPay = amount; }
+};
+
+#endif //SP_CPPBANK_PART_H------------------------
+Title: Portfolio.cpp
+Content:
+#include <algorithm>
+#include "Portfolio.h"
+
+Portfolio::Portfolio(const std::vector<Facility>& facilities)
+        : facilities(facilities) {}
+
+void Portfolio::addFacility(const Facility& facility) {
+    facilities.push_back(facility);
+}
+
+void Portfolio::removeFacility(const std::string& contractNumber) {
+    facilities.erase(std::remove_if(facilities.begin(), facilities.end(),
+                                    [&contractNumber](const Facility& facility) {
+                                        return facility.getContractNumber() == contractNumber;
+                                    }),
+                     facilities.end());
+}
+
+double Portfolio::calculateTotalInterest() const {
+    double totalInterest = 0;
+    for (const auto& facility : facilities) {
+        totalInterest += facility.calculateInterest();
+    }
+    return totalInterest;
+}------------------------
+Title: Portfolio.h
+Content:
+#ifndef SP_CPPBANK_PORTFOLIO_H
+#define SP_CPPBANK_PORTFOLIO_H
+
+#include <vector>
+#include "Facility.h"
+
+class Portfolio {
+public:
+    Portfolio() {} // default constructor
+    Portfolio(const std::vector<Facility> &facilities);
+
+    void addFacility(const Facility& facility);
+    double calculateTotalValue() const;
+    double calculateTotalInterest() const;
+private:
+    std::vector<Facility> facilities;
+
+    void removeFacility(const std::string &contractNumber);
+};
+
+#endif // SP_CPPBANK_PORTFOLIO_H------------------------
 Title: README.md
 Content:
 # SP_CPPBank------------------------
@@ -218,6 +360,8 @@ Content:
 #include "Currency.h"
 #include "Deal.h"
 #include "Facility.h"
+#include "Portfolio.h"
+#include "Part.h"
 
 int main() {
     // Create Lenders
@@ -232,18 +376,28 @@ int main() {
     Borrower borrower("Air France");
 
     // Create a Currency
-
     Currency currency("USD");
 
     auto now = std::chrono::system_clock::now();
 
     // Deal start and end dates
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    std::chrono::system_clock::time_point start = now;
     std::chrono::system_clock::time_point ending = start + std::chrono::hours(24*365);  // One year later
 
     // Create a Deal
     Deal deal("S1234", lender1, pool, borrower, 10000000, currency, start, ending);
 
+    // Create a Facility with an interest rate of 0.05 (5%) and an early repayment penalty of 0.2 (20%)
+    Facility facility("FAC1", lender1, pool, borrower, 5000000.0, currency, start, ending, 0.05, now, 0.2);
+
+    // Create a Part with a repayment of 1 million and a repayment date a year later
+    auto one_year_from_now = std::chrono::system_clock::now() + std::chrono::hours(24*365);
+    Part part(facility, 1000000.0, one_year_from_now);
+    // Create a Portfolio
+    Portfolio portfolio;
+
+    // Add the facility to the portfolio
+    portfolio.addFacility(facility);
 
     // Print some info about the deal
     std::cout << "Deal Contract Number: " << deal.getContractNumber() << std::endl;
@@ -253,36 +407,39 @@ int main() {
     std::cout << "Deal Currency: " << deal.getCurrency().getCode() << std::endl;
     std::cout << "Deal Status: " << deal.getStatus() << std::endl;
 
-
-//    Facility facility("FAC1", deal, lender1, 5000000.0, now, now);
-    Facility facility("FAC1", lender1, pool, borrower, 5000000.0, currency, start, ending, 0.5, now, 0.2);
-
-    std::cout << "Facility ----------------" << std::endl;
     // Print out details of the facility
     std::cout << "Facility Contract Number: " << facility.getContractNumber() << std::endl;
     std::cout << "Facility Agent: " << facility.getAgent().getName() << std::endl;
     std::cout << "Facility Borrower: " << facility.getBorrower().getName() << std::endl;
     std::cout << "Facility Amount: " << facility.getAmount() << std::endl;
     std::cout << "Facility Currency: " << facility.getCurrency().getCode() << std::endl;
-    std::cout << "Facility Status: " << facility.getStatus() << std::endl;
+    std::cout << "Facility Interest: " << facility.calculateInterest() << std::endl;  // Print calculated interest
 
+    // Print out details of the Part
+    std::cout << "Part Facility Contract Number: " << part.getFacility().getContractNumber() << std::endl;
+    std::cout << "Part Repayment Amount: " << part.getRepaymentAmount() << std::endl;
+    std::cout << "Part Remaining to Pay: " << part.getRemainingToPay() << std::endl;
+
+    // Print out details of the portfolio
+    std::cout << "Portfolio Total Interest: " << portfolio.calculateTotalInterest() << std::endl;
 
     return 0;
-}
-------------------------
-Title: output.txt
-Content:
-------------------------
+}------------------------
 Title: script.sh
 Content:
 #!/bin/bash
 
+# Clean output file if it exists
+if [[ -f output.txt ]]; then
+	rm output.txt
+fi
+
 for file in *; do
 	if [[ -f $file ]]; then
-		echo "Title: $file"
-		echo "Content:"
-		cat "$file"
-		echo "------------------------"
+		echo "Title: $file" >> output.txt
+		echo "Content:" >> output.txt
+		cat "$file" >> output.txt
+		echo "------------------------" >> output.txt
 	fi
 done
 
