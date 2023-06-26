@@ -15,7 +15,7 @@ Notre projet est structuré selon une **architecture orientée objet**, qui nous
 La classe `Deal` est la classe principale et elle est héritée par la classe `Facility`, ce qui nous a permis d'éviter la duplication du code. Les classes `Lender`, `Borrower` et `Currency` sont des composants de base qui sont utilisés par les classes `Deal` et `Facility`. La classe `Portfolio` est utilisée pour gérer plusieurs `Facility`. L'utilisation de **surcharges** et de **polymorphisme** a également été appliquée pour améliorer la modularité du code.
 
 
-![mermaid-diagram-2023-06-25-211214](https://github.com/EAMehdi/SP_CPPBank/assets/45198822/f52d03c7-8894-4eb2-92a8-7c116e83c398)
+![mermaid-diagram-2023-06-25-211214](http://image.noelshack.com/fichiers/2023/26/1/1687790126-cpp-diagram-2.png)
 
 ```console
 C:\Users\AM\Documents\GitHub\SP_CPPBank\cmake-build-debug\SP_CPPBank.exe
